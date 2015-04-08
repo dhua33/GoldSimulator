@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Capitalism</title>
+    <script src="js/phaser.min.js"></script>
+    <script src="js/Boot.js"></script>
+    <script src="js/Preloader.js"></script>
+    <script src="js/MainMenu.js"></script>
+    <script src="js/Game.js"></script>
+
+<style>
+body
+{
+    color: #000000;
+    font-family: "Avenir", Verdana, sans-serif;
+}
+#readme
+{
+    margin-top: 10px;
+}
+</style>
+
+</head>
+<body bgcolor = "#A6E6FA">
+<script>
+(function() {
+		var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game');
+    game.state.add('Boot', boot);
+    game.state.add('Preloader', preloader);
+    game.state.add('MainMenu', mainmenu);
+    game.state.add('Game', main);
+    game.state.start('Boot');
+    })();
+</script>
+<div id="game"></div>
+<div id="readme">
+<h2>Gold Simulator</h2>
+<ul>
+
+<li><strong>High Concept:</strong>
+Make money through indirect control.
+</li>
+
+<li><strong>Player Experience Goals:</strong>
+Experience the immediate gratification of accumulating money.
+</li>
+
+<li><strong>Genre:</strong>
+Simulator.
+</li>
+
+<li><strong>Game play:</strong>
+Click on buttons to allocate funds and invest money to make money. You can exchange lesser coins for higher coins. Every 100 investments in all sources of income will double all production income.
+</li>
+
+<li><strong>Prototype goal:</strong>
+Make a game where one can make money with minimal effort and indirect control of what happens.
+</li>
+
+<li><strong>Features:</strong>
+Buttons, automated generation, currency exchange, and money.
+</li>
+
+<li><strong>Setting/Premise:</strong>
+You are a young investor hoping to make tons of money.
+</li>
+
+<li><strong>Story:</strong>
+None.
+</li>
+
+<li><strong>Target Audience:</strong>
+Everyone 10 and up who has interest in making money with minimal effort and indirect control games.
+</li>
+
+<li><strong>Play time:</strong>
+1-5 mins.
+</li>
+
+<li><strong>Strategies:</strong>
+Invest wisely and evenly, netting you the best chance at making tons of money.
+</li>
+
+<li><strong>Prototype Assets:</strong>
+Gold: 
+http://opengameart.org/content/coins-sounds 
+Beep: 
+https://www.freesound.org/people/pan14/sounds/263133/ 
+Select: 
+https://www.freesound.org/people/killkhan/sounds/150222/ 
+Jump: 
+http://opengameart.org/content/jump-sound-effect-yo-frankie 
+Music: 
+"Late Night Sneakin" (HappyBivouac / http://ocremix.org) 
+
+</li>
+
+<li><strong>Prototype Closest Other Game:</strong>
+
+</li>
+
+</ul>
+</div>
+</body>
+</html>
