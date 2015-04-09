@@ -12,6 +12,8 @@ preloader.prototype = {
 				this.load.image('StoG', 'assets/StoG.png');
 				this.load.image('GtoP', 'assets/GtoP.png');
 				this.load.image('purchase', 'assets/purchase.png');
+				this.load.image('b10', 'assets/b10.png');
+				this.load.image('b100', 'assets/b100.png');
 				//audio
 				this.load.audio('buy', 'assets/buy.mp3');
 				this.load.audio('music', 'assets/music.mp3');

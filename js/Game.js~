@@ -2,113 +2,228 @@ var main = function(game) {};
 
 main.prototype = {
 		create: function() {
-				// set world
-				this.map = this.game.add.tilemap('map');
-				this.map.addTilesetImage('tiles', 'snowTiles');
-				this.physics.startSystem(Phaser.Physics.ARCADE);
-				
-				// layers
-				this.bg = this.map.createLayer('BG');
-				this.walls = this.map.createLayer('Walls');
-				this.invisible = this.map.createLayer('Invisible');
-				this.artifacts = this.map.createLayer('Artifacts');
-				this.walls.resizeWorld();
-				this.map.setCollisionBetween(1, 5000, true, 'Walls');
-				this.map.setCollisionBetween(1, 5000, true, 'Invisible');
-				this.invisible.visible = false;
-				
-				// player sprites and properties
-				this.p = this.add.sprite(20, 650, 'player');
-				this.p.anchor.setTo(0.5, 1);
-				this.physics.arcade.enable(this.p);
-				this.p.body.collideWorldBounds = true;
-				// animations
-				this.p.animations.add('left', [10, 11, 10, 9], 7);
-				this.p.animations.add('right', [4, 5, 4, 3], 7);
-				this.p.body.gravity.y = 800;
-				this.p.body.setSize(this.p.body.width*0.5, this.p.body.height);
-				this.jumpBool = false;
-				this.camera.follow(this.p);
-				this.small = false;
-				this.jumpbig = -600;
-				this.jumpsmall = -165;
-				this.jumpval = 240;
-				this.jump = this.jumpbig;
-				this.p.speed = 320;
+				// bg
+				this.bg = this.add.image(0, 0, 'bg');
 				
 				// audio
-				this.music = this.add.audio('music', 0.4, true);
-				this.sound.walk = this.add.audio('walk', 0.3);
+				this.music = this.add.audio('music', 0.3, false);
+				this.music2 = this.add.audio('music2', 0.3, false);
 				this.sound.beep = this.add.audio('beep', 0.15);
 				this.sound.select = this.add.audio('select', 0.15);
-				this.sound.jump = this.add.audio('jump', 0.25);
+				this.sound.buy = this.add.audio('buy', 0.15);
+				this.music.onStop.add(this.m2, this);
+				this.music2.onStop.add(this.m1, this);
 				this.music.play();
 				
-				// set keyboard controls
-				this.keys = this.input.keyboard.createCursorKeys();
-				this.keys.space = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+				// variables
+				this.Cstyle = {font: "24px Verdana", fill: "#D2691E", align: "left" };
+				this.Sstyle = {font: "24px Verdana", fill: "#C0C0C0", align: "left" };
+				this.Gstyle = {font: "24px Verdana", fill: "#FFD700", align: "left" };
+				this.Pstyle = {font: "24px Verdana", fill: "#87CEFA", align: "left" };
+				this.style = {font: "36px Verdana", fill: "#000000", align: "left" };
+				this.p = [];
+				this.pC = 1;
+				this.pS = 0;
+				this.pG = 0;
+				this.pP = 0;
+				this.Ccost = 1;
+				this.Cprofit = 0;
+				this.Cinv = 0;
+				this.Scost = 1;
+				this.Sprofit = 0;
+				this.Sinv = 0;
+				this.Gcost = 1;
+				this.Gprofit = 0;
+				this.Ginv = 0;
+				this.Pcost = 1;
+				this.Pprofit = 0;
+				this.Pinv = 0;
+				this.m = 1;
 				
-				//item creation
-				this.i = 3;
-				this.j = 118;
-				this.items = this.add.group();
-				this.items.enableBody = true;
-				while (this.i <= this.j) {
-						this.map.createFromObjects('Artifacts', this.i, 'item', 0, true, false, this.items);
-						this.i += 1;
+				// buttons
+				this.C = this.add.button(140, 320, 'purchase', (function() {this.buyC(1)}), this);
+				this.S = this.add.button(460, 320, 'purchase', (function() {this.buyS(1)}), this);
+				this.G = this.add.button(140, 470, 'purchase', (function() {this.buyG(1)}), this);
+				this.P = this.add.button(460, 470, 'purchase', (function() {this.buyP(1)}), this);
+				
+				this.CC = this.add.button(245, 320, 'b10', (function() {this.buyC(10)}), this);
+				this.SS = this.add.button(565, 320, 'b10', (function() {this.buyS(10)}), this);
+				this.GG = this.add.button(245, 470, 'b10', (function() {this.buyG(10)}), this);
+				this.PP = this.add.button(565, 470, 'b10', (function() {this.buyP(10)}), this);
+				
+				this.CCC = this.add.button(350, 320, 'b100', (function() {this.buyC(100)}), this);
+				this.SSS = this.add.button(670, 320, 'b100', (function() {this.buyS(100)}), this);
+				this.GGG = this.add.button(350, 470, 'b100', (function() {this.buyG(100)}), this);
+				this.PPP = this.add.button(670, 470, 'b100', (function() {this.buyP(100)}), this);
+				
+				this.Ec = this.add.button(15, 270, 'CtoS', this.CtoS, this);
+				this.Es = this.add.button(15, 350, 'StoG', this.StoG, this);
+				this.Eg = this.add.button(15, 430, 'GtoP', this.GtoP, this);
+				
+				
+				// text
+				this.pCtext = this.add.text(140, 15, "" + this.pC, this.Cstyle);
+				this.pStext = this.add.text(140, 55, "" + this.pS, this.Sstyle);
+				this.pGtext = this.add.text(140, 95, "" + this.pG, this.Gstyle);
+				this.pPtext = this.add.text(140, 135, "" + this.pP, this.Pstyle);
+				
+				this.CcostText = this.add.text(225, 230, "" + this.Ccost, this.Cstyle);
+				this.CprofitText = this.add.text(215, 260, "" + (this.Cprofit*this.m), this.Cstyle);
+				this.CinvestText = this.add.text(285, 290, "" + this.Cinv, this.Cstyle);
+				
+				
+				this.ScostText = this.add.text(545, 230, "" + this.Scost, this.Sstyle);
+				this.SprofitText = this.add.text(535, 260, "" + (this.Sprofit*this.m), this.Sstyle);
+				this.SinvestText = this.add.text(605, 290, "" + this.Sinv, this.Sstyle);
+				
+				
+				this.GcostText = this.add.text(225, 380, "" + this.Gcost, this.Gstyle);
+				this.GprofitText = this.add.text(215, 410, "" + (this.Gprofit*this.m), this.Gstyle);
+				this.GinvestText = this.add.text(285, 440, "" + this.Ginv, this.Gstyle);
+				
+				
+				this.PcostText = this.add.text(545, 380, "" + this.Pcost, this.Pstyle);
+				this.PprofitText = this.add.text(535, 410, "" + (this.Pprofit*this.m), this.Pstyle);
+				this.PinvestText = this.add.text(605, 440, "" + this.Pinv, this.Pstyle);
+				
+				this.mul = this.add.text(360, 540, "" + this.m, this.style);
+				
+				this.time.events.add(50, this.Ctimer, this);
+				this.time.events.add(100, this.Stimer, this);
+				this.time.events.add(200, this.Gtimer, this);
+				this.time.events.add(400, this.Ptimer, this);
+		},
+		m1: function() {
+				this.music.play();
+		},
+		m2: function() {
+				this.music2.play();
+		},
+		buyC: function(mul) {
+				org = this.Cinv*1;
+				if(this.pC >= (this.Ccost+this.Ccost+13*(mul-1))*mul/2) {
+						this.pC -= (this.Ccost+this.Ccost+13*(mul-1))*mul/2;
+						this.Cprofit += 6*mul;
+						this.Cinv += mul;
+						this.Ccost += 13*mul*this.m;
+						if(Math.floor(this.Cinv/100) > Math.floor(org/100) && Math.floor(this.Sinv/100) >= Math.floor(this.Cinv/100) && Math.floor(this.Ginv/100) >= Math.floor(this.Cinv/100) && Math.floor(this.Pinv/100) >= Math.floor(this.Cinv/100)) {
+								this.m *= 2;
+								this.Ccost *= this.m;
+								this.sound.select.play();
+						} else {
+								this.sound.buy.play();
+						}
 				}
 		},
-		collect: function(player, item) {
-				this.sound.beep.play();
-				item.destroy();
+		buyS: function(mul) {
+				org = this.Sinv*1;
+				if(this.pS >= (this.Scost+this.Scost+11*(mul-1))*mul/2) {
+						this.pS -= (this.Scost+this.Scost+11*(mul-1))*mul/2;
+						this.Sprofit += 5*mul;
+						this.Sinv += mul;
+						this.Scost += 11*mul*this.m;
+						if(Math.floor(this.Sinv/100) > Math.floor(org/100) && Math.floor(this.Cinv/100) >= Math.floor(this.Sinv/100) && Math.floor(this.Ginv/100) >= Math.floor(this.Sinv/100) && Math.floor(this.Pinv/100) >= Math.floor(this.Sinv/100)) {
+								this.m *= 2;
+								this.Scost *= this.m;
+								this.sound.select.play();
+						} else {
+								this.sound.buy.play();
+						}
+				}
 		},
-		update: function() {
-				this.invis = this.physics.arcade.collide(this.p, this.invisible);
-				this.jumpCollide = this.physics.arcade.collide(this.p, this.walls)
-				this.physics.arcade.overlap(this.p, this.items, this.collect, null, this);
-				this.p.body.velocity.x = 0;
-				
-				// movement
-				if(this.keys.left.isDown) {
-						this.p.animations.play('left');
-						this.p.body.velocity.x = -this.p.speed;
-						this.sound.walk.play('', 0, 0.03, false, false);
-				} else if( this.keys.right.isDown) {
-						this.p.animations.play('right');
-						this.p.body.velocity.x = this.p.speed;
-						this.sound.walk.play('', 0, 0.03, false, false);
-				} else {
-						this.p.animations.stop();
-				}
-				
-				if(this.keys.down.isDown) {
-						if(!this.small) {
-								this.p.scale.set(0.5, 0.5);
-								this.p.speed = 160;
-								this.jump = this.jumpsmall;
-								this.small = true;
-								this.jumpval = 165;
+		buyG: function(mul) {
+				org = this.Ginv*1;
+				if(this.pG >= (this.Gcost+this.Gcost+9*(mul-1))*mul/2) {
+						this.pG -= (this.Gcost+this.Gcost+9*(mul-1))*mul/2;
+						this.Gprofit += 4*mul;
+						this.Ginv += mul;
+						this.Gcost += 9*mul*this.m;
+						if(Math.floor(this.Ginv/100) > Math.floor(org/100) && Math.floor(this.Sinv/100) >= Math.floor(this.Ginv/100) && Math.floor(this.Cinv/100) >= Math.floor(this.Ginv/100) && Math.floor(this.Pinv/100) >= Math.floor(this.Ginv/100)) {
+								this.m *= 2;
+								this.Gcost *= this.m;
 								this.sound.select.play();
-						}
-				} else if(this.keys.up.isDown) {
-						if(this.small && !this.invis) {
-								this.p.scale.set(1, 1);
-								this.p.speed = 320;
-								this.jump = this.jumpbig;
-								this.small = false;
-								this.jumpval = 240;
-								this.sound.select.play();
+						} else {
+								this.sound.buy.play();
 						}
 				}
+		},
+		buyP: function(mul) {
+				org = this.Pinv*1;
+				if(this.pP >= (this.Pcost+this.Pcost+5*(mul-1))*mul/2) {
+						this.pP -= (this.Pcost+this.Pcost+5*(mul-1))*mul/2;
+						this.Pprofit += 2*mul;
+						this.Pinv += mul;
+						this.Pcost += 5*mul*this.m;
+						if(Math.floor(this.Pinv/100) > Math.floor(org/100) && Math.floor(this.Sinv/100) >= Math.floor(this.Pinv/100) && Math.floor(this.Ginv/100) >= Math.floor(this.Pinv/100) && Math.floor(this.Cinv/100) >= Math.floor(this.Pinv/100)) {
+								this.m *= 2;
+								this.Pcost *= this.m;
+								this.sound.select.play();
+						} else {
+								this.sound.buy.play();
+						}
+				}
+		},
+		CtoS: function() {
+				if(this.pC >= 200) {
+						this.pS += Math.floor(this.pC/200);
+						this.pC = this.pC%200;
+								this.sound.buy.play();
+				}
+		},
+		StoG: function() {
+				if(this.pS >= 200) {
+						this.pG += Math.floor(this.pS/200);
+						this.pS = this.pS%200;
+								this.sound.buy.play();
+				}
+		},
+		GtoP: function() {
+				if(this.pG >= 200) {
+						this.pP += Math.floor(this.pG/200);
+						this.pG = this.pG%200;
+								this.sound.buy.play();
+				}
+		},
+		Ctimer: function() {
+				// increments
+				this.pC += this.Cprofit*this.m
 				
-				if(this.keys.space.isDown && this.jumpCollide && !this.invis) {
-						this.jumpBool = true;
-						this.sound.jump.play();
-				}
-				if(this.p.body.velocity.y < this.jump) {
-						this.jumpBool = false;
-				} else if(this.jumpBool && this.p.body.velocity.y > this.jump){
-						this.p.body.velocity.y -= this.jumpval;
-				}
+				// set text
+				this.CcostText.setText("" + this.Ccost);
+				this.CprofitText.setText("" + this.Cprofit*this.m);
+				this.CinvestText.setText("" + this.Cinv);
+				
+				this.ScostText.setText("" + this.Scost);
+				this.SprofitText.setText("" + this.Sprofit*this.m);
+				this.SinvestText.setText("" + this.Sinv);
+				
+				this.GcostText.setText("" + this.Gcost);
+				this.GprofitText.setText("" + this.Gprofit*this.m);
+				this.GinvestText.setText("" + this.Ginv);
+				
+				this.PcostText.setText("" + this.Pcost);
+				this.PprofitText.setText("" + this.Pprofit*this.m);
+				this.PinvestText.setText("" + this.Pinv);
+				
+				this.pCtext.setText("" + this.pC);
+				this.pGtext.setText("" + this.pG);
+				this.pStext.setText("" + this.pS);
+				this.pPtext.setText("" + this.pP);
+				
+				this.mul.setText("" + this.m);
+				
+				this.time.events.add(50, this.Ctimer, this);
+		},
+		Stimer: function() {
+				this.pS += this.Sprofit*this.m
+				this.time.events.add(100, this.Stimer, this);
+		},
+		Gtimer: function() {
+				this.pG += this.Gprofit*this.m
+				this.time.events.add(200, this.Gtimer, this);
+		},
+		Ptimer: function() {
+				this.pP += this.Pprofit*this.m
+				this.time.events.add(400, this.Ptimer, this);
 		}
 }

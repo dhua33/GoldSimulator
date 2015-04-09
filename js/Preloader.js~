@@ -15,6 +15,7 @@ preloader.prototype = {
 				//audio
 				this.load.audio('buy', 'assets/buy.mp3');
 				this.load.audio('music', 'assets/music.mp3');
+				this.load.audio('music2', 'assets/music2.mp3');
 				this.load.audio('select', 'assets/select.mp3');
 				this.load.audio('beep', 'assets/beep.mp3');
 		},
